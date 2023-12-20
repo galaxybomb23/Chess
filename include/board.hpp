@@ -5,6 +5,10 @@
 #define BOARD_HPP
 #include "bitBoard.hpp"
 #include <iostream>
+#include <string>
+#include "fen.hpp"
+
+// Fen class
 
 class Board
 {
@@ -52,6 +56,8 @@ public:
     Board(bool is_base) : whitePawns(0x000000000000FF00ULL), whiteKnights(0x0000000000000042ULL), whiteBishops(0x0000000000000024ULL), whiteRooks(0x0000000000000081ULL), whiteQueens(0x0000000000000008ULL), whiteKing(0x0000000000000010ULL), blackPawns(0x00FF000000000000ULL), blackKnights(0x4200000000000000ULL), blackBishops(0x2400000000000000ULL), blackRooks(0x8100000000000000ULL), blackQueens(0x0800000000000000ULL), blackKing(0x1000000000000000ULL){};
     // Constructor for empty board
     Board() : whitePawns(0ULL), whiteKnights(0ULL), whiteBishops(0ULL), whiteRooks(0ULL), whiteQueens(0ULL), whiteKing(0ULL), blackPawns(0ULL), blackKnights(0ULL), blackBishops(0ULL), blackRooks(0ULL), blackQueens(0ULL), blackKing(0ULL){};
+    // constructor for fen
+    Board(const fen &Fen);
 
     // generate all possible moves
     void generateMoves();
@@ -94,6 +100,7 @@ public:
     ~Board() {}
 };
 
+// Prints the board
 void Board::printBoard()
 {
     std::cout << "   X  │  A  │  B  │  C  │  D  │  E  │  F  │  G  │  H  │" << std::endl;
@@ -159,5 +166,70 @@ void Board::printBoard()
         std::cout << std::endl;
     }
 };
+
+// Constructor for fen
+Board::Board(const fen &Fen)
+{
+    // set active move
+    isWhiteTurn = Fen.activeColor == "w" ? true : false;
+
+    // itterate through fen board and set bitboards
+    int i = 0, j = 0;
+    for (auto c : Fen.boardFen)
+    {
+        if (c == '/')
+        {
+            i++;
+            j = 0;
+        }
+        else if (c >= '1' && c <= '8')
+        {
+            j += c - '0';
+        }
+        else
+        {
+            switch (c)
+            {
+            case 'P':
+                whitePawns.setBit(i * 8 + j);
+                break;
+            case 'N':
+                whiteKnights.setBit(i * 8 + j);
+                break;
+            case 'B':
+                whiteBishops.setBit(i * 8 + j);
+                break;
+            case 'R':
+                whiteRooks.setBit(i * 8 + j);
+                break;
+            case 'Q':
+                whiteQueens.setBit(i * 8 + j);
+                break;
+            case 'K':
+                whiteKing.setBit(i * 8 + j);
+                break;
+            case 'p':
+                blackPawns.setBit(i * 8 + j);
+                break;
+            case 'n':
+                blackKnights.setBit(i * 8 + j);
+                break;
+            case 'b':
+                blackBishops.setBit(i * 8 + j);
+                break;
+            case 'r':
+                blackRooks.setBit(i * 8 + j);
+                break;
+            case 'q':
+                blackQueens.setBit(i * 8 + j);
+                break;
+            case 'k':
+                blackKing.setBit(i * 8 + j);
+                break;
+            }
+            j++;
+        }
+    }
+}
 
 #endif // BOARD_HPP
